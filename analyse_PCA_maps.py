@@ -1,13 +1,13 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[1]:
+# In[35]:
 
 
 #This code is the pipeline for plotting the PCA maps and doing some sample selection.
 
 
-# In[4]:
+# In[102]:
 
 
 get_ipython().run_line_magic('matplotlib', 'inline')
@@ -62,10 +62,6 @@ config.setRelease(release)
 #config.token
 #print(config.access, config.release)
 
-if (release=='DR15'):
-    release='MPL-7'
-print(release)
-
 dir = '/Users/krowlands/work/Science/MaNGA/'
 fig_dir = dir+'FIGS/'+release+'/'
 
@@ -75,7 +71,7 @@ plt.rcParams['ytick.labelsize'] = label_size
 plt.rcParams['axes.labelsize'] = 14
 
 
-# In[5]:
+# In[103]:
 
 
 #Open cat
@@ -129,7 +125,7 @@ print(ngal)
 MaNGA_HYB10_dir = dir+'DATA/'+release+'/'
 
 
-# In[6]:
+# In[104]:
 
 
 petro_frac_out = np.array([2.])
@@ -146,52 +142,51 @@ theta = nsa_elpetro_phi #deg - use for getAperture in sky coords
 #nsa_elpetro_phi is Angle (E of N) - needs -90 to make the right way up.
 
 
-# In[7]:
+# In[105]:
 
 
 #PCA boundaries
-vertices_lowmass = {
-"psb_cut":0.24, \
-"psb_cut2":-0.4, \
-"psb_cut3":-0.1, \
-"psb_peak_x":-4.7, \
-"sb_cut":0.15, \
-"sb_vert1":-2.3, \
-"sf_vert1":-6.3, \
-"sf_vert2":-5.5, \
-"sf_vert3":-2.6, \
-"sf_vert4":-3.2, \
-"green_vert1": -1.0, \
-"green_vert2": -2.1, \
-"junk_y_lower": -1.4, \
-"junk_y_lower2": -3., \
-"junk_y_upper": 2., \
-"left_cut": -7.1, \
-"right_cut": 2., \
-}
 
-vertices_highmass = {
-"psb_cut":0.24, \
-"psb_cut2":0.18, \
-"psb_cut3":0.2, \
-"psb_peak_x":-4.7, \
-"sb_cut":0.0, \
-"sb_vert1":-1.9, \
-"sf_vert1":-5.5, \
-"sf_vert2":-5.2, \
-"sf_vert3":-2.2-0.07, \
-"sf_vert4":-3.2-0.07, \
-"green_vert1": -0.1, \
-"green_vert2": -2.0-0.07, \
-"junk_y_lower": -1.2, \
-"junk_y_lower2": -3., \
-"junk_y_upper": 2., \
-"left_cut": -7.1-0.07, \
-"right_cut": 2., \
-}
+vertices_lowmass = \
+{'psb_cut': 0.24,
+ 'psb_cut2': -0.4,
+ 'psb_cut3': -0.1,
+ 'psb_peak_x': -4.7,
+ 'sb_cut': 0.15,
+ 'sb_vert1': -2.3,
+ 'sf_vert1': -6.3,
+ 'sf_vert2': -5.5,
+ 'sf_vert3': -2.6,
+ 'sf_vert4': -3.2,
+ 'green_vert1': -1.0,
+ 'green_vert2': -2.1,
+ 'junk_y_lower': -1.4,
+ 'junk_y_lower2': -3.0,
+ 'junk_y_upper': 2.0,
+ 'left_cut': -7.1,
+ 'right_cut': 2.0}
+
+vertices_highmass = \
+{'psb_cut': 0.24,
+ 'psb_cut2': 0.18,
+ 'psb_cut3': 0.2,
+ 'psb_peak_x': -4.7,
+ 'sb_cut': 0.0,
+ 'sb_vert1': -1.9,
+ 'sf_vert1': -5.5,
+ 'sf_vert2': -5.2,
+ 'sf_vert3': -2.27,
+ 'sf_vert4': -3.27,
+ 'green_vert1': -0.1,
+ 'green_vert2': -2.07,
+ 'junk_y_lower': -1.2,
+ 'junk_y_lower2': -3.0,
+ 'junk_y_upper': 2.0,
+ 'left_cut': -7.17,
+ 'right_cut': 2.0}
 
 
-# In[8]:
+# In[106]:
 
 
 #Read in results files for all spaxels
@@ -202,39 +197,14 @@ spaxel_properties_master = pickle.load( open( dir+'PCA_results_DR17_fits/spaxel_
             pickle.load( open( dir+'PCA_results_DR17_fits/elliptical_radii_params_'+release+'.p', "rb" ) )
 
 
-# In[9]:
-
-
-#Remove edge-on galaxies
-highly_inclined = ascii.read(dir+'DATA/MPL-7/mpl7_highly_inclined.dat') #From Preethi Nair
-
-nsa_id_highly_inclined = highly_inclined['nsa_id']
-
-nsa_id_highly_edgeon = nsa_id_highly_inclined[highly_inclined['edge-on?']=='y'].data
-nsa_id_highly_inclined = nsa_id_highly_inclined[highly_inclined['edge-on?']=='y'].data
-highly_edgeon_indices = np.isin(nsa_id, nsa_id_highly_edgeon)
-    
-if ((release=='MPL-8') | (release=='DR17')):
-    #Inspected by-eye by Kate Rowlands, just PLATEIFU
-    edgon_extra = ascii.read(dir+'DATA/MPL-8/mpl8_highly_inclined.dat', format='commented_header')
-    highly_edgeon_indices2 = np.isin(np.array(plateifu.astype(str, copy=False)), np.array(edgon_extra['plateifu']))
-
-
-# In[10]:
+# In[107]:
 
 
 #Select galaxies based on central spaxel classifcation within an elliptical aperture
 
-#8312-12701 Re is wrong. 
-#Select out visually identified edge-on galaxies in PSB selection. Axis ratio didn't work too well.
+#Carefully inspect visually to remove edge-on galaxies
 
-select_psb = np.where((psb_frac_ell>=0.5) & (masked_frac_ell<0.5) & (plateifu!='8312-12701') & \
-                      (highly_edgeon_indices==False) & \
-                     (highly_edgeon_indices2==False) & \
-                     (petro_r_50<50.) )
-#These were excluded previously, I'm not sure why, check (might be edge-on).                
-#& (plateifu!='8932-9102') & (plateifu!='8550-6102') & (plateifu!='7992-12701') &
-                     #(plateifu!='8623-12703') & (plateifu!='9865-12701') )
+select_psb = np.where((psb_frac_ell>=0.5) & (masked_frac_ell<0.5) & (petro_r_50<50.) )
 
 psbs = plateifu[select_psb]
 #print(psbs)
@@ -289,15 +259,15 @@ t1.rename_column('col6', 'masked_frac_ell')
 t1.write(dir+'DATA/'+release+'/all_frac_'+release+'.fits', format='fits', overwrite=True)
 
 
-# In[11]:
+# In[108]:
 
 
 from matplotlib import colors
 
 select = select_psb
 
-n_select = 15
-#n_select = int(len(plateifu[select])/2)+1 #Everything, will be slow/too large for n_select>20
+n_select = 4
+#n_select = int(len(plateifu[select])/2)+1 #Everything will be slow/too large for n_select>20
 
 # make a color map of fixed colors
 cmap = colors.ListedColormap(['red', 'blue', 'goldenrod', 'green', 'purple'])
@@ -319,11 +289,6 @@ for i in range(n_select):
         #Plot SDSS image
         image = showImage(plateifu=plateifu[ind], show_image=False)
         img = axs[i, j*2].imshow(image)
-        #Doesn't work #####
-        #image = Image(plateifu=plateifu[ind])
-        #img = axs[i, j*2].imshow(image)
-        #axs[i, j*2] = image.plot(ax=axs[i, (j*2)+1])
-        #######
         axs[i, j*2].set_title(str(plateifu[ind]), fontsize=13)
         axs[i, j*2].get_xaxis().set_visible(False) #Suppress tick labels
         axs[i, j*2].get_yaxis().set_visible(False)
@@ -344,27 +309,19 @@ for i in range(n_select):
             ha = maps['emline_gflux_ha_6564']
 
             #Bad data from qualmask
-            bad_data = np.ma.getmaskarray(PCA_SNR_masked) * 2**30 # and set bit 30 (DONOTUSE)
+            bad_data = np.ma.getmaskarray(PCA_SNR_masked) * 2**30 # set bit 30 (DONOTUSE)
 
-            #mask=bad_data, use_masks='NOCOV', 
             fig, ax, cb = mapplot.plot(value=PCA_SNR_masked, mask=bad_data, use_masks='NOCOV', \
                          cmap=cmap, fig=fig, ax=axs[i, (j*2)+1], cbrange=(0.5,5.5), return_cb=True,
                                       title=str(np.round(psb_frac_ell[ind], 2)))
             cb.remove() #Remove colour bar
 
-            #Elliptical annuli. #Having issue with non-local maps
-            #aperture = maps.getAperture([(ra[ind], dec[ind])], (ellip_ap_radius_as_out_major[ind], \
-            #            nsa_elpetro_ba[ind]*ellip_ap_radius_as_out_major[ind], theta[ind]), \
-            #            coord_type='sky', aperture_type='elliptical')
-
-            #ellipical_annuli_sel = aperture.to_pixel(maps.wcs)
-            #ellipical_annuli_sel.plot(ax=axs[i, (j*2)+1], lw=1, zorder=100)
         
 plt.savefig(fig_dir+'PSB_'+release+'.pdf', bbox_inches='tight')
 plt.show()
 
 
-# In[12]:
+# In[109]:
 
 
 #PCA classification of spaxels. points needs to be a (ngal, 2) array
@@ -506,7 +463,7 @@ plt.savefig(fig_dir+'PC12_MaNGA_spaxels_lowmass.pdf', bbox_inches='tight')
 plt.show()
 
 
-# In[13]:
+# In[111]:
 
 
 #PCA classification of spaxels. points needs to be a (ngal, 2) array
@@ -537,7 +494,7 @@ ax.contour(counts.T, levels, extent=extent,linewidths=2, colors='white', linesty
 with open(dir+'OUTPUT/contours_highmass_'+release+'.pkl','wb') as f:
     pickle.dump([counts, levels, extent], f)
 
-ax.set_xlim(-7.1, 1.7)
+ax.set_xlim(-7.1, 2.)
 ax.set_ylim(-2.7, 2.)
 ax.set_xlabel('PC1 ($4000\\mathrm{\\mathring{A}}$ break strength)', fontsize=16)
 ax.set_ylabel('PC2 (Excess Balmer absorption)', fontsize=16)

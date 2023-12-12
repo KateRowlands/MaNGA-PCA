@@ -167,45 +167,45 @@ theta = nsa_elpetro_phi #deg - use for getAperture in sky coords
 # In[117]:
 
 
-vertices_lowmass = {
-"psb_cut":0.24, \
-"psb_cut2":-0.4, \
-"psb_cut3":-0.1, \
-"psb_peak_x":-4.7, \
-"sb_cut":0.15, \
-"sb_vert1":-2.3, \
-"sf_vert1":-6.3, \
-"sf_vert2":-5.5, \
-"sf_vert3":-2.6, \
-"sf_vert4":-3.2, \
-"green_vert1": -1.0, \
-"green_vert2": -2.1, \
-"junk_y_lower": -1.4, \
-"junk_y_lower2": -3., \
-"junk_y_upper": 2., \
-"left_cut": -7.1, \
-"right_cut": 2., \
-}
+#PCA boundaries
 
-vertices_highmass = {
-"psb_cut":0.24, \
-"psb_cut2":0.18, \
-"psb_cut3":0.2, \
-"psb_peak_x":-4.7, \
-"sb_cut":0.0, \
-"sb_vert1":-1.9, \
-"sf_vert1":-5.5, \
-"sf_vert2":-5.2, \
-"sf_vert3":-2.2-0.07, \
-"sf_vert4":-3.2-0.07, \
-"green_vert1": -0.1, \
-"green_vert2": -2.0-0.07, \
-"junk_y_lower": -1.2, \
-"junk_y_lower2": -3., \
-"junk_y_upper": 2., \
-"left_cut": -7.1-0.07, \
-"right_cut": 2., \
-}
+vertices_lowmass = \
+{'psb_cut': 0.24,
+ 'psb_cut2': -0.4,
+ 'psb_cut3': -0.1,
+ 'psb_peak_x': -4.7,
+ 'sb_cut': 0.15,
+ 'sb_vert1': -2.3,
+ 'sf_vert1': -6.3,
+ 'sf_vert2': -5.5,
+ 'sf_vert3': -2.6,
+ 'sf_vert4': -3.2,
+ 'green_vert1': -1.0,
+ 'green_vert2': -2.1,
+ 'junk_y_lower': -1.4,
+ 'junk_y_lower2': -3.0,
+ 'junk_y_upper': 2.0,
+ 'left_cut': -7.1,
+ 'right_cut': 2.0}
+
+vertices_highmass = \
+{'psb_cut': 0.24,
+ 'psb_cut2': 0.18,
+ 'psb_cut3': 0.2,
+ 'psb_peak_x': -4.7,
+ 'sb_cut': 0.0,
+ 'sb_vert1': -1.9,
+ 'sf_vert1': -5.5,
+ 'sf_vert2': -5.2,
+ 'sf_vert3': -2.27,
+ 'sf_vert4': -3.27,
+ 'green_vert1': -0.1,
+ 'green_vert2': -2.07,
+ 'junk_y_lower': -1.2,
+ 'junk_y_lower2': -3.0,
+ 'junk_y_upper': 2.0,
+ 'left_cut': -7.17,
+ 'right_cut': 2.0}
 
 snr_min = 3.
 
